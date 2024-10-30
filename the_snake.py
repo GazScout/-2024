@@ -33,7 +33,7 @@ SPEED = 10
 ACCELERATION = 2
 
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-pg.display.set_caption("Змейка. Для выхода из игры нажмите ESC.")
+pg.display.set_caption("Для выхода из игры нажмите ESC.")
 clock = pg.time.Clock()
 screen.fill(BOARD_BACKGROUND_COLOR)
 
@@ -294,8 +294,8 @@ def main():
         points = snake.length
         max_points = max(max_points, points)
         pg.display.set_caption(
-            "Змейка. Выход - ESC.  "
-            f"Длина змейки: {points}. Рекорд: {max_points}  "
+            "Змейка.Выход-ESC"
+            f"Длина змейки:{points}.Рекорд:{max_points}"
             f"SHIFT - ускорение."
         )
         pg.display.update()

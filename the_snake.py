@@ -7,7 +7,6 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 GRID_SIZE = 20
 GRID_WIDTH = (SCREEN_WIDTH - 400) // GRID_SIZE
-GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 INFO_AREA_WIDTH = 400
 
 # Цветовая палитра
@@ -51,7 +50,6 @@ INSTRUCTION_TEXT = [
     "> Выход из игры - клавиша Esc",
     "> Яблоки - красные",
     "> Отрава - синяя",
-
     "> За каждые 5 съеденных яблок:",
     "  + 2 к скорости дижения",
     "  + 1 отрава на экране",
@@ -70,13 +68,14 @@ class GameObject:
 
     def draw(self):
         """Отрисовка фигур с переопределением в наследуемых классах"""
+        pass  # Метод должен быть переопределен в подклассах
 
     def draw_cell(self, position, color=None):
         """Отрисовка ячейки на экране"""
         x, y = position
         color = color or self.body_color
         pg.draw.rect(screen, color, (x * GRID_SIZE, y * GRID_SIZE,
-                                     GRID_SIZE, GRID_SIZE))
+                                      GRID_SIZE, GRID_SIZE))
 
 
 class Snake(GameObject):
@@ -133,7 +132,6 @@ class Apple(GameObject):
 
     def __init__(self, body_color=RED):
         super().__init__(body_color)
-        self.position = None
 
     def draw(self):
         """Отрисовка на игровом поле"""
@@ -239,8 +237,7 @@ def main():
     while True:
         handle_keys(snake)
 
-        if snake.move():
-            game_over("self")
+        if not snake.move():
             continue
 
         collision = snake.positions[0] in snake.positions[1:]
@@ -248,15 +245,13 @@ def main():
             game_over("self")
             continue
 
-        collision = snake.positions[0] in [bomb.position for
-                                           bomb in bombs]
+        collision = snake.positions[0] in [bomb.position for bomb in bombs]
         if collision:
             game_over("bomb")
             continue
 
         if snake.get_head_position() == apple.position:
-            occupied_cells = [*snake.positions, *(bomb.position
-                                                  for bomb in bombs)]
+            occupied_cells = [*snake.positions, *(bomb.position for bomb in bombs)]
             apple.randomize_position(occupied_cells)
             snake.grow = True
             score += 1
@@ -265,11 +260,9 @@ def main():
 
             if apples_eaten % 5 == 0:
                 frame_delay -= 10
-                occupied_cells = [*snake.positions, apple.position,
-                                  *(bomb.position for bomb in bombs)]
+                occupied_cells = [*snake.positions, apple.position, *(bomb.position for bomb in bombs)]
                 bomb = Apple(body_color=BLUE)
-                if bomb is not None:
-                    bomb.randomize_position(occupied_cells)
+                bomb.randomize_position(occupied_cells)
                 bombs.append(bomb)
 
         draw_game_area(snake, apple, bombs)

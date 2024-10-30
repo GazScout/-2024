@@ -4,16 +4,19 @@ import pygame as pg
 
 pg.init()
 
+# Основные настройки экрана и игрового поля
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 
+# Направления движения
 UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
+# Повороты, зависящие от текущего направления
 TURNING = {
     LEFT: {pg.K_UP: UP, pg.K_DOWN: DOWN},
     RIGHT: {pg.K_UP: UP, pg.K_DOWN: DOWN},
@@ -21,6 +24,7 @@ TURNING = {
     DOWN: {pg.K_LEFT: LEFT, pg.K_RIGHT: RIGHT},
 }
 
+# Цвета для различных элементов
 BOARD_BACKGROUND_COLOR = (200, 200, 220)
 BORDER_COLOR = (200, 200, 220)
 APPLE_COLOR = (255, 0, 0)
@@ -29,6 +33,7 @@ SNAKE_BLOOD_COLOR = (230, 66, 245)
 SKIN_COLOR = (104, 53, 44)
 WALLS_COLOR = (57, 69, 102)
 
+# Скорость и ускорение змейки
 SPEED = 10
 ACCELERATION = 2
 
@@ -39,20 +44,24 @@ screen.fill(BOARD_BACKGROUND_COLOR)
 
 
 class GameObject:
+    """Основной класс для всех игровых объектов."""
+
     def __init__(self, body_color=None) -> None:
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.body_color = body_color
 
     def draw_cell(self, position, color=None) -> None:
+        """Рисует ячейку в указанной позиции с заданным цветом."""
         color = color or self.body_color
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     def draw(self):
-        """Нужен для отрисовки произвольного наследника."""
+        """Отрисовывает объект на экране."""
 
     def randomize_position(self, positions) -> None:
+        """Задает случайную позицию, исключая занятые позиции."""
         while True:
             self.position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,

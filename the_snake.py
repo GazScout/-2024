@@ -4,19 +4,16 @@ import pygame as pg
 
 pg.init()
 
-# Основные настройки экрана и игрового поля
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 
-# Направления движения
 UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
-# Повороты, зависящие от текущего направления
 TURNING = {
     LEFT: {pg.K_UP: UP, pg.K_DOWN: DOWN},
     RIGHT: {pg.K_UP: UP, pg.K_DOWN: DOWN},
@@ -24,7 +21,6 @@ TURNING = {
     DOWN: {pg.K_LEFT: LEFT, pg.K_RIGHT: RIGHT},
 }
 
-# Цвета для различных элементов
 BOARD_BACKGROUND_COLOR = (200, 200, 220)
 BORDER_COLOR = (200, 200, 220)
 APPLE_COLOR = (255, 0, 0)
@@ -33,7 +29,6 @@ SNAKE_BLOOD_COLOR = (230, 66, 245)
 SKIN_COLOR = (104, 53, 44)
 WALLS_COLOR = (57, 69, 102)
 
-# Скорость и ускорение змейки
 SPEED = 10
 ACCELERATION = 2
 
@@ -44,24 +39,24 @@ screen.fill(BOARD_BACKGROUND_COLOR)
 
 
 class GameObject:
-    """Основной класс для всех игровых объектов."""
+    """Базовый класс игрового объекта."""
 
     def __init__(self, body_color=None) -> None:
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.body_color = body_color
 
     def draw_cell(self, position, color=None) -> None:
-        """Рисует ячейку в указанной позиции с заданным цветом."""
+        """Отрисовывает ячейку на экране."""
         color = color or self.body_color
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     def draw(self):
-        """Отрисовывает объект на экране."""
+        """Метод отрисовки наследников объекта."""
 
     def randomize_position(self, positions) -> None:
-        """Задает случайную позицию, исключая занятые позиции."""
+        """Устанавливает случайную позицию объекта."""
         while True:
             self.position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
@@ -72,6 +67,8 @@ class GameObject:
 
 
 class Snake(GameObject):
+    """Класс змейки."""
+
     def __init__(self, body_color: tuple = SNAKE_COLOR) -> None:
         super().__init__(body_color)
         self.positions = [self.position]
@@ -80,9 +77,11 @@ class Snake(GameObject):
         self.last = None
 
     def update_direction(self, direction) -> None:
+        """Обновляет направление движения змейки."""
         self.direction = direction
 
     def move(self) -> None:
+        """Перемещает змейку в заданном направлении."""
         self.position = (
             (self.position[0] + self.direction[0] * GRID_SIZE) % SCREEN_WIDTH,
             (self.position[1] + self.direction[1] * GRID_SIZE) % SCREEN_HEIGHT,
@@ -100,6 +99,7 @@ class Snake(GameObject):
             self.last = None
 
     def draw(self):
+        """Отрисовывает змейку на экране."""
         if self.last:
             self.draw_cell(self.last, BOARD_BACKGROUND_COLOR)
         for position in self.positions:
@@ -108,19 +108,23 @@ class Snake(GameObject):
         self.draw_cell(self.position)
 
     def draw_damage(self):
+        """Отрисовывает эффект повреждения змейки."""
         self.draw_cell(self.get_head_position(), SNAKE_BLOOD_COLOR)
         pg.display.update()
 
     def get_head_position(self) -> tuple:
+        """Возвращает позицию головы змейки."""
         return self.positions[0]
 
     def check_collision(self, walls) -> bool:
+        """Проверяет столкновение змейки с препятствиями."""
         if self.get_head_position() in self.positions[4:] + walls.positions:
             self.draw_damage()
             return True
         return False
 
     def reset(self) -> None:
+        """Сбрасывает змейку в начальное состояние."""
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.positions = [self.position]
         self.length = len(self.positions)
@@ -128,53 +132,69 @@ class Snake(GameObject):
 
 
 class Apple(GameObject):
+    """Класс яблока."""
+
     def __init__(self, busy=list(), body_color: tuple = APPLE_COLOR) -> None:
         super().__init__(body_color)
         self.randomize_position(busy)
 
     def draw(self):
+        """Отрисовывает яблоко на экране."""
         self.draw_cell(self.position)
 
 
 class Skins(GameObject):
+    """Класс скинов змейки."""
+
     def __init__(self, body_color: tuple = SKIN_COLOR) -> None:
         super().__init__(body_color)
         self.positions = set()
 
     def add_skin(self, position):
+        """Добавляет новую позицию скина."""
         self.positions.add(position)
 
     def draw(self):
+        """Отрисовывает скины на экране."""
         for position in self.positions:
             self.draw_cell(position)
 
     def reset(self):
+        """Сбрасывает скины."""
         self.positions.clear()
 
 
 class Walls(GameObject):
+    """Класс стен."""
+
     def __init__(self, body_color: tuple = WALLS_COLOR) -> None:
         super().__init__(body_color)
         self.positions = list()
 
     def randomize_position(self, positions) -> None:
+        """Устанавливает случайную позицию стены."""
         super().randomize_position(positions)
         self.positions.append(self.position)
 
     def draw(self):
+        """Отрисовывает стены на экране."""
         if len(self.positions) != 0:
             self.draw_cell(self.positions[-1])
 
     def reset(self):
+        """Сбрасывает стены."""
         self.positions = list()
 
 
 def ate(snake, apple, skin, walls):
+    """Проверяет, съела ли змейка яблоко или скин."""
     last = snake.last
     if apple.position == snake.get_head_position():
         snake.length += 1
-        list_positions = (front(snake) + snake.positions +
-                          list(skin.positions) + walls.positions)
+        list_positions = (
+            front(snake) + snake.positions +
+            list(skin.positions) + walls.positions
+        )
         apple.randomize_position(list_positions)
         if not snake.length % 5:
             skin.add_skin(last)
@@ -195,6 +215,7 @@ def ate(snake, apple, skin, walls):
 
 
 def front(snake) -> list:
+    """Возвращает позиции, находящиеся перед головой змейки."""
     list_busy: list = [
         (
             (snake.positions[0][0] + snake.direction[0] * GRID_SIZE * before)
@@ -208,6 +229,7 @@ def front(snake) -> list:
 
 
 def handle_keys(game_object):
+    """Обрабатывает нажатия клавиш для управления змейкой."""
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
@@ -225,6 +247,7 @@ def handle_keys(game_object):
 
 
 def pressed_shift():
+    """Проверяет, зажата ли клавиша Shift."""
     keys = pg.key.get_pressed()
     if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT]:
         return ACCELERATION
@@ -232,17 +255,20 @@ def pressed_shift():
 
 
 def draw(*args):
+    """Отрисовывает все переданные игровые объекты."""
     for game_object in args:
         game_object.draw()
 
 
 def restart(*args):
+    """Сбрасывает состояние всех переданных объектов."""
     for game_object in args:
         game_object.reset()
     screen.fill(BOARD_BACKGROUND_COLOR)
 
 
 def main():
+    """Основная функция запуска игры."""
     snake = Snake()
     apple = Apple(front(snake) + snake.positions)
     skin = Skins()

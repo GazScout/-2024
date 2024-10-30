@@ -1,4 +1,4 @@
-from random import randint, randrange
+from random import randint, randrange  # Убедитесь, что используете все импортируемые функции
 import sys
 import pygame as pg
 

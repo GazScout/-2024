@@ -39,9 +39,8 @@ screen.fill(BOARD_BACKGROUND_COLOR)
 
 
 class GameObject:
-
     def __init__(self, body_color=None) -> None:
-        self.position = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
+        self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.body_color = body_color
 
     def draw_cell(self, position, color=None) -> None:
@@ -64,10 +63,8 @@ class GameObject:
 
 
 class Snake(GameObject):
-
     def __init__(self, body_color: tuple = SNAKE_COLOR) -> None:
         super().__init__(body_color)
-
         self.positions = [self.position]
         self.length = len(self.positions)
         self.direction: tuple = RIGHT
@@ -79,7 +76,7 @@ class Snake(GameObject):
     def move(self) -> None:
         self.position = (
             (self.position[0] + self.direction[0] * GRID_SIZE) % SCREEN_WIDTH,
-            (self.position[1] + self.direction[1] * GRID_SIZE) % SCREEN_HEIGHT
+            (self.position[1] + self.direction[1] * GRID_SIZE) % SCREEN_HEIGHT,
         )
 
         past_length: int = len(self.positions)
@@ -122,7 +119,6 @@ class Snake(GameObject):
 
 
 class Apple(GameObject):
-
     def __init__(self, busy=list(), body_color: tuple = APPLE_COLOR) -> None:
         super().__init__(body_color)
         self.randomize_position(busy)
@@ -132,7 +128,6 @@ class Apple(GameObject):
 
 
 class Skins(GameObject):
-
     def __init__(self, body_color: tuple = SKIN_COLOR) -> None:
         super().__init__(body_color)
         self.positions = set()
@@ -149,7 +144,6 @@ class Skins(GameObject):
 
 
 class Walls(GameObject):
-
     def __init__(self, body_color: tuple = WALLS_COLOR) -> None:
         super().__init__(body_color)
         self.positions = list()
@@ -170,8 +164,8 @@ def ate(snake, apple, skin, walls):
     last = snake.last
     if apple.position == snake.get_head_position():
         snake.length += 1
-        list_positions = (front(snake) + snake.positions
-                          + list(skin.positions) + walls.positions)
+        list_positions = (front(snake) + snake.positions +
+                          list(skin.positions) + walls.positions)
         apple.randomize_position(list_positions)
         if not snake.length % 5:
             skin.add_skin(last)
@@ -197,9 +191,10 @@ def front(snake) -> list:
             (snake.positions[0][0] + snake.direction[0] * GRID_SIZE * before)
             % SCREEN_WIDTH,
             (snake.positions[0][1] + snake.direction[1] * GRID_SIZE * before)
-            % SCREEN_HEIGHT
+            % SCREEN_HEIGHT,
         )
-        for before in range(1, 5)]
+        for before in range(1, 5)
+    ]
     return list_busy
 
 
@@ -207,7 +202,7 @@ def handle_keys(game_object):
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
-            sys.exit()  
+            sys.exit()
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
@@ -216,7 +211,8 @@ def handle_keys(game_object):
 
             if event.key in TURNING[game_object.direction]:
                 return game_object.update_direction(
-                    TURNING[game_object.direction][event.key])
+                    TURNING[game_object.direction][event.key]
+                )
 
 
 def pressed_shift():

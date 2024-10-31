@@ -75,7 +75,7 @@ class GameObject:
         x, y = position
         color = color or self.body_color
         pg.draw.rect(screen, color, (x * GRID_SIZE, y * GRID_SIZE,
-                                      GRID_SIZE, GRID_SIZE))
+                                     GRID_SIZE, GRID_SIZE))
 
 
 class Snake(GameObject):
@@ -251,7 +251,8 @@ def main():
             continue
 
         if snake.get_head_position() == apple.position:
-            occupied_cells = [*snake.positions, *(bomb.position for bomb in bombs)]
+            occupied_cells = [*snake.positions,
+                              * (bomb.position for bomb in bombs)]
             apple.randomize_position(occupied_cells)
             snake.grow = True
             score += 1
@@ -260,7 +261,8 @@ def main():
 
             if apples_eaten % 5 == 0:
                 frame_delay -= 10
-                occupied_cells = [*snake.positions, apple.position, *(bomb.position for bomb in bombs)]
+                occupied_cells = [
+                    *snake.positions, apple.position, *(bomb.position for bomb in bombs)]
                 bomb = Apple(body_color=BLUE)
                 bomb.randomize_position(occupied_cells)
                 bombs.append(bomb)
